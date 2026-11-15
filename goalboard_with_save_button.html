@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goalboard</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c31;--panel2:#1b2640;--text:#f4f7ff;--muted:#9ba9c4;--line:#293653;--accent:#78a6ff;--good:#6ed6ad}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172544 0,#0b1020 55%);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1050px;margin:auto;padding:38px 20px 70px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:30px}.brand{font-size:13px;letter-spacing:.18em;color:var(--accent);font-weight:800}.top h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0}.sub{color:var(--muted);margin:0}.count{border:1px solid var(--line);background:#111a2e;padding:10px 14px;border-radius:14px;color:var(--muted);white-space:nowrap}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}.panel,.goal{background:linear-gradient(160deg,#17223a,#11192b);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 35px #0003}.panel{padding:22px;position:sticky;top:18px}.panel h2{margin:0 0 18px;font-size:19px}.field{margin:13px 0}.field label{display:block;color:#c3cde0;font-size:12px;font-weight:700;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;border:1px solid #344361;background:#0d1527;color:var(--text);border-radius:10px;padding:11px 12px;font:inherit;outline:none}.field textarea{min-height:72px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}.hint{font-size:12px;color:var(--muted);margin-top:5px}.btn{border:0;border-radius:11px;padding:11px 15px;font:700 14px inherit;cursor:pointer;transition:.15s}.primary{background:var(--accent);color:#081326;width:100%;margin-top:8px}.primary:hover{filter:brightness(1.08)}.secondary{background:#263653;color:#dce7ff}.danger{background:#402632;color:#ffc4ce}.goals-head{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 14px}.goals-head h2{font-size:20px;margin:0}.empty{border:1px dashed #3a4b6d;border-radius:18px;padding:36px 22px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);font-size:17px;margin-bottom:5px}.goal{padding:20px;margin-bottom:14px}.goal-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.goal h3{font-size:18px;margin:0 0 3px;overflow-wrap:anywhere}.desc{color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#b9d0ff;background:#253757;border-radius:20px;padding:5px 9px;white-space:nowrap}.percent{font-size:28px;font-weight:800;letter-spacing:-.04em;margin:16px 0 8px}.percent small{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:0}.bar{height:9px;background:#27334c;border-radius:20px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#6594f3,#7bd9bd);border-radius:20px;transition:width .25s}.progress-line{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:8px}.controls{display:flex;gap:8px;align-items:center;margin-top:17px;flex-wrap:wrap}.controls input{width:100px;background:#0d1527;color:var(--text);border:1px solid #344361;border-radius:9px;padding:9px}.controls button{padding:9px 12px}.step-list{margin:15px 0 0;padding:0;list-style:none}.step-list li{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid #26334d;color:#dce5f7;font-size:13px}.step-list input{accent-color:var(--good);margin-top:4px}.step-list .done{text-decoration:line-through;color:#8492ad}.actions{display:flex;gap:7px}.actions button{font-size:12px;padding:7px 9px}.footer{color:#71809c;font-size:11px;text-align:center;margin-top:28px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.panel{position:static}.top{align-items:flex-start;flex-direction:column}.count{align-self:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="brand">GOALBOARD / PERSONAL PROGRESS</div><h1>Make progress visible.</h1><p class="sub">Set a target, break it into steps, and keep moving.</p></div>
+    <div class="count" id="count">0 goals</div>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <h2 id="formTitle">Create a goal</h2>
+      <form id="goalForm">
+        <div class="field"><label for="goalName">GOAL NAME</label><input id="goalName" maxlength="70" placeholder="e.g. Prepare for MUN" required></div>
+        <div class="field"><label for="goalType">GOAL TYPE</label><select id="goalType"><option value="number">Number goal</option><option value="steps">Step goal</option></select></div>
+        <div class="field"><label for="goalDescription" id="descLabel">TARGET NUMBER</label><input id="goalDescription" maxlength="100" placeholder="e.g. 100" required><div class="hint" id="descHint">Enter the final target number.</div></div>
+        <div class="field" id="unitField"><label for="goalUnit">UNIT (OPTIONAL)</label><input id="goalUnit" maxlength="20" placeholder="e.g. pages, kg, reps"></div>
+        <div class="field" id="stepsField" hidden><label for="goalSteps">STEPS (ONE PER LINE)</label><textarea id="goalSteps" placeholder="Research the topic&#10;Write opening speech&#10;Prepare position paper"></textarea><div class="hint">Each step is worth an equal share of 100%.</div></div>
+        <button class="btn primary" id="submitBtn" type="submit">Add goal</button>
+        <button class="btn secondary" id="cancelEdit" type="button" style="width:100%;margin-top:8px" hidden>Cancel editing</button>
+      </form>
+    </section>
+    <section>
+      <div class="goals-head"><h2>Your goals</h2><span class="sub" id="summary">0 completed</span></div>
+      <div id="goalList"><div class="empty"><strong>Your first goal starts here.</strong>Add a number goal or turn a big goal into smaller steps.</div></div>
+    </section>
+  </main>
+  <div class="footer">
+    Your goals are saved automatically in this browser on this device.
+    <div style="margin-top:14px">
+      <button class="btn primary" id="saveAllBtn" type="button" style="max-width:220px">Save all goals</button>
+      <div id="saveStatus" aria-live="polite" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let goals=JSON.parse(localStorage.getItem('goalboard-goals')||'[]');
+let editingId=null;
+function save(){localStorage.setItem('goalboard-goals',JSON.stringify(goals));render();$('saveStatus').textContent='Saved on this device.'}
+$('saveAllBtn').addEventListener('click',()=>{localStorage.setItem('goalboard-goals',JSON.stringify(goals));$('saveStatus').textContent='All goals saved successfully.'});
+function typeChanged(){
+ const steps=$('goalType').value==='steps';
+ $('stepsField').hidden=!steps;$('unitField').hidden=steps;
+ $('goalDescription').hidden=steps;$('descLabel').hidden=steps;$('descHint').hidden=steps;
+ $('goalSteps').required=steps;$('goalDescription').required=!steps;
+}
+$('goalType').addEventListener('change',typeChanged);
+function resetForm(){editingId=null;$('goalForm').reset();$('goalType').value='number';typeChanged();$('formTitle').textContent='Create a goal';$('submitBtn').textContent='Add goal';$('cancelEdit').hidden=true}
+$('cancelEdit').onclick=resetForm;
+$('goalForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const type=$('goalType').value,name=$('goalName').value.trim();
+ const existing=goals.find(g=>g.id===editingId);
+ const goal={id:editingId||crypto.randomUUID(),name,type,description:type==='number'?'':$('goalDescription').value.trim(),unit:type==='number'?$ ('goalUnit').value.trim():'',target:type==='number'?Number($('goalDescription').value):0,current:existing?.current||0,steps:type==='steps'?$('goalSteps').value.split('\n').map(s=>s.trim()).filter(Boolean).map((label,i)=>({id:i,label,done:existing?.steps?.find(x=>x.label===label)?.done||false})):[]};
+ if(type==='number'&&(!Number.isFinite(goal.target)||goal.target<=0)){alert('Enter a target number greater than zero.');return}
+ if(type==='steps'&&!goal.steps.length){alert('Add at least one step.');return}
+ if(existing)goals=goals.map(g=>g.id===editingId?goal:g);else goals.unshift(goal);
+ resetForm();save();
+});
+function progress(g){if(g.type==='number')return Math.max(0,Math.min(100,g.current/g.target*100));return g.steps.length?g.steps.filter(s=>s.done).length/g.steps.length*100:0}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function editGoal(id){const g=goals.find(x=>x.id===id);if(!g)return;editingId=id;$('goalName').value=g.name;$('goalType').value=g.type;typeChanged();if(g.type==='number'){$('goalDescription').value=g.target;$('goalUnit').value=g.unit||''}else $('goalSteps').value=g.steps.map(s=>s.label).join('\n');$('formTitle').textContent='Edit goal';$('submitBtn').textContent='Save changes';$('cancelEdit').hidden=false;window.scrollTo({top:0,behavior:'smooth'})}
+function removeGoal(id){if(confirm('Delete this goal?')){goals=goals.filter(g=>g.id!==id);save()}}
+function updateNumber(id,delta){const g=goals.find(x=>x.id===id);if(!g)return;g.current=Math.max(0,Math.min(g.target,g.current+delta));save()}
+function setNumber(id,value){const g=goals.find(x=>x.id===id);if(!g)return;g.current=Math.max(0,Math.min(g.target,Number(value)||0));save()}
+function toggleStep(id,index){const g=goals.find(x=>x.id===id);if(!g)return;g.steps[index].done=!g.steps[index].done;save()}
+function render(){
+ $('count').textContent=goals.length+' goal'+(goals.length===1?'':'s');
+ $('summary').textContent=goals.filter(g=>progress(g)>=100).length+' completed';
+ if(!goals.length){$('goalList').innerHTML='<div class="empty"><strong>Your first goal starts here.</strong>Add a number goal or turn a big goal into smaller steps.</div>';return}
+ $('goalList').innerHTML=goals.map(g=>{
+ const p=progress(g),pct=Math.round(p),done=g.type==='number'?`${g.current} / ${g.target}${g.unit?' '+esc(g.unit):''}`:`${g.steps.filter(s=>s.done).length} / ${g.steps.length} steps`;
+ const controls=g.type==='number'?`<div class="controls"><button class="btn secondary" onclick="updateNumber('${g.id}',-1)">− 1</button><button class="btn secondary" onclick="updateNumber('${g.id}',1)">+ 1</button><input aria-label="Set current progress" type="number" min="0" max="${g.target}" step="any" value="${g.current}" onchange="setNumber('${g.id}',this.value)"><span class="hint">Set current value</span></div>`:
+ `<ul class="step-list">${g.steps.map((s,i)=>`<li><input type="checkbox" ${s.done?'checked':''} onchange="toggleStep('${g.id}',${i})"><span class="${s.done?'done':''}">${esc(s.label)}</span></li>`).join('')}</ul>`;
+ return `<article class="goal"><div class="goal-top"><div><h3>${esc(g.name)}</h3><div class="desc">${g.type==='number'?'Target: '+esc(String(g.target))+(g.unit?' '+esc(g.unit):''):g.steps.length+' steps'}</div></div><span class="tag">${g.type==='number'?'Number goal':'Step goal'}</span></div><div class="percent">${pct}% <small>COMPLETED</small></div><div class="bar"><div class="fill" style="width:${p}%"></div></div><div class="progress-line"><span>${done}</span><span>${p>=100?'Goal reached':'Keep going'}</span></div>${controls}<div class="controls actions"><button class="btn secondary" onclick="editGoal('${g.id}')">Edit</button><button class="btn danger" onclick="removeGoal('${g.id}')">Delete</button></div></article>`
+ }).join('');
+}
+typeChanged();render();
+</script>
+</body></html>
